@@ -4,6 +4,7 @@ import java.io.FileReader;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.ListIterator;
@@ -12,6 +13,7 @@ import java.util.Queue;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.PriorityQueue;
 
 /**
  * A simple weighted, directed, graph.
@@ -282,7 +284,7 @@ public class Graph {
           if (!this.hasNext()) {
             throw new NoSuchElementException();
           }
-          while (!this.ie.hasNext()) {
+          while (!this.ie.hasNext()) { //potential fix
             this.ie = Graph.this.vertices[++this.vertex].iterator();
           } // while
           ++this.pos;
@@ -342,6 +344,25 @@ public class Graph {
   public Iterable<Edge> edgesFrom(String vertex) {
     return this.edgesFrom(vertexNumber(vertex));
   } // edgesFrom(String)
+
+  public List<Integer> reachableFrom(int start){
+    List<Integer> reachable = new ArrayList<>();
+    Iterable<Integer> iter = vertices();
+    for(Integer v : iter){
+      if(v != start){
+        int finish = v;
+        if(path(start, finish) != null){
+          //mark(finish);
+          reachable.add(finish);
+        }
+      }
+    }
+    return reachable;
+  }
+
+  public List<Integer> reachableFrom(String start){
+    return this.reachableFrom(vertexNumber(start));
+  }
 
   /**
    * Get a path from start to finish. If no such path exists, returns null.
@@ -743,7 +764,7 @@ public class Graph {
   private int newVertexNumber() {
     if (this.unusedVertices.isEmpty()) {
       this.expand();
-    }
+    } // if
     return this.unusedVertices.remove();
   } // newVertexNumber()
 
@@ -758,5 +779,51 @@ public class Graph {
     } // if
     return num;
   } // safeVertexNumber(String)
+
+  public ArrayList<Edge> primsAlgorithm() throws Exception{
+    //Graph mst = new Graph();
+    ArrayList<Edge> mst = new ArrayList<Edge>();
+
+    // grab random vertex; 0 for testing
+    int v = 0; 
+    mark(v);
+
+    // compare edge weights
+    Comparator<Edge> compare = (e1, e2) -> e1.weight() < e2.weight() ? -1 : e1.weight() == e2.weight() ? 0 : 1;
+    PriorityQueue<Edge> remaining = new PriorityQueue<Edge>(this.vertices.length, compare);
+
+    // add each of the edges from the vertex to remaining
+    for(Edge e : this.vertices[v]){
+      remaining.add(e);
+      remaining.add(new Edge(e.to(), e.from(), e.weight()));
+      //mst.addVertex(this.vertexName(e.to()));
+    } // for
+
+    while(!remaining.isEmpty()){
+      Edge edge = remaining.poll();
+      // if either edge is NOT in the mst
+      if(!isMarked(edge.from()) || !isMarked(edge.to())) {
+        //add to mst
+        try {
+          //String name = this.vertexName(edge.to());
+          //if(!validVertex(edge.to()))
+          mst.add(edge);
+          mst.add(new Edge(edge.to(), edge.from(), edge.weight()));
+          //mst.addEdge(edge.to(), edge.from(), edge.weight());
+          mark(edge.to());
+        } catch (Exception e) {
+          System.err.println(e.getMessage());
+        } // try/catch
+
+        // add each of the edges from the second vertex to remaining
+        for(Edge e : vertices[edge.to()]){
+          remaining.add(e);
+        } // for
+      } // if
+    } // while
+
+    return mst;
+  } // primsAlgorithm()
+
 
 } // class Graph
