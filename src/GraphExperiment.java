@@ -71,16 +71,22 @@ public class GraphExperiment {
     g.addEdge(0, 2, 3);
     g.addEdge(0, 3, 3);
     g.addEdge(1, 2, 2);
+    g.addEdge(2, 1, 0);
     g.addEdge(1, 4, 4);
     g.addEdge(2, 3, 2);
     g.addEdge(3, 4, 1);
     g.addEdge(4, 5, 5);
     g.dump(pen);
 
-    ArrayList<Edge> mst = g.primsAlgorithm();
-    for(Edge e : mst){
-      pen.println(e.toString());
-    }
+    // ArrayList<Edge> mst = g.primsAlgorithm();
+    // for(Edge e : mst){
+    //   pen.println(e.toString());
+    // }
+
+    g.reachableFrom(4);
+    // for (Integer integer : reachable) {
+    //   pen.println(integer);
+    // }
     
   } // main(String[])
 

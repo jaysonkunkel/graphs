@@ -345,23 +345,25 @@ public class Graph {
     return this.edgesFrom(vertexNumber(vertex));
   } // edgesFrom(String)
 
-  public List<Integer> reachableFrom(int start){
+  public void reachableFrom(int start){
     List<Integer> reachable = new ArrayList<>();
-    Iterable<Integer> iter = vertices();
-    for(Integer v : iter){
-      if(v != start){
-        int finish = v;
-        if(path(start, finish) != null){
-          //mark(finish);
+    //Iterable<Integer> iter = vertices();
+    //String[] names = this.vertexNames;
+    for(String v : vertexNames){
+      if(vertexNumber(v) != start){
+        int finish = vertexNumber(v);
+        if(finish != -1 && path(start, finish) != null){
+          mark(finish);
           reachable.add(finish);
+          System.out.println(finish);
         }
       }
     }
-    return reachable;
+    //return reachable;
   }
 
-  public List<Integer> reachableFrom(String start){
-    return this.reachableFrom(vertexNumber(start));
+  public void reachableFrom(String start){
+    this.reachableFrom(vertexNumber(start));
   }
 
   /**
